@@ -1,56 +1,62 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt =require('bcryptjs');
-const jwt = require('jsonwebtoken')
+import mongoose from "mongoose";
+import validator from "validator";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
 const userSchema = new mongoose.Schema({
-  name:{
-    type:String,
-    require:true,
-    trim:true
+  name: {
+    type: String,
+    required: true,
+    trim: true,
   },
-  email:{
-    type:String,
-    require:true,
-    trim:true,
-    unique:true,
-    lowercase:true,
-    validate(value){
-      if(!validator.isEmail(value)){
-        throw new Error(`Email is invalid`);
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    unique: true,
+    lowercase: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error("Email is invalid");
       }
-    }
+    },
   },
-  password:{
-    type:String,
-    unique:true,
-    require:true,
-    trim:true,
+  password: {
+    type: String,
+    required: true,
+    trim: true,
     minlength: 8,
     validate(value) {
-      if (value.toLowerCase().includes('password')) {
-        throw new Error(`Password can not contain Password`)
+      if (value.toLowerCase().includes("password")) {
+        throw new Error("Password cannot contain 'password'");
       }
-    }
+    },
   },
-  tokens: [{
-    token: {
+  tokens: [
+    {
+      token: {
         type: String,
-        required: true
-    }
-  }]
-})
-userSchema.pre('save',async function (next){
-  const user =this;
-  if(user.isModified('password')){
-    user.password=await bcrypt.hash(user.password,8)}
-    next()
-})
-userSchema.methods.generateAuthToken=async function(){
-  const user=this;
-  const token =jwt.sign({_id:user._id.toString()},'thesecretcode')
-  user.token =user.token.concat({token})
-  await user.save()
-  return token
-}
-const User=mongoose.model('User',userSchema)
+        required: true,
+      },
+    },
+  ],
+});
+
+// Hash password before saving
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 8);
+  }
+  next();
+});
+
+// Generate JWT token
+userSchema.methods.generateAuthToken = async function () {
+  const token = jwt.sign({ _id: this._id.toString() }, "thesecretcode");
+  this.tokens = this.tokens.concat({ token });
+  await this.save();
+  return token;
+};
+
+const User = mongoose.model("User", userSchema);
 export default User;
