@@ -57,6 +57,17 @@ userSchema.methods.generateAuthToken = async function () {
   await this.save();
   return token;
 };
+userSchema.statics.findByCredentials = async(email,password)=>{
+     const user = await User.findOne({email});
+     if(!user){
+      throw new error ('unable to signin')
+     }
+     const isMatch =await bcrypt.compare(password,user.password);
+     if(!isMatch){
+      throw new error('Unable to sign in');
+     }
+     return user;
+}
 
 const User = mongoose.model("User", userSchema);
 export default User;

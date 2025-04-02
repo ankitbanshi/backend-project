@@ -17,6 +17,24 @@ class AuthController {
       });
     }
   };
+  static signin =async (req,res)=>{
+    try{
+      const user =await User.findByCredentials(req.body.email,req.body.password)
+      const token = await user.generateAuthToken()
+      res.status(200).send({
+        status:200,
+        message:"User logged in Successfully",
+        data:{
+          userData:user,token
+        }})
+    }
+    catch(error){
+      res.status(400).send({
+        status:400,
+        message:error.message
+      })
+    }
+  }
 }
 
 export default AuthController;
