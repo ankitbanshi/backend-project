@@ -1,17 +1,19 @@
-import { useState } from 'react'
+import React from "react";
+import {  Routes, Route } from "react-router-dom";
+import { SignUp, SignIn } from "./pages/SignUp" // Import your auth components
+import Home from "./Home"; // Import the Home component
 
-import './App.css'
-import {SignIn,SignUp} from './pages/SignUp'
-
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-     <SignUp/>
-      <SignIn/>
-    </>
-  )
-}
+  
+      <Routes>
+        <Route path="/" element={<SignUp />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/home" element={<Home />} />
+      </Routes>
+   
+  );
+};
 
-export default App
+export default App;

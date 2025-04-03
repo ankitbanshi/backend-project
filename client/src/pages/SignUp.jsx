@@ -1,11 +1,31 @@
-import React from "react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:8000/api/users",
+});
 
 const SignUp = () => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignUp = async (name, email ,password) => {
+    try {
+      const response = await api.post("/signup", { name, email, password });
+      console.log("Sign-up successful:", response.data);
+      navigate("/home"); // Redirect to home page after successful sign-up
+    } catch (error) {
+      console.error("Sign-up error:", error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await handleSignUp(userName, email, password);
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-black-500 to-blue-500 p-4">
@@ -38,6 +58,7 @@ const SignUp = () => {
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-4 rounded-lg hover:bg-indigo-700 transition duration-300 font-bold shadow-lg text-lg"
+          onClick={handleSubmit}
         >
           Sign Up
         </button>
@@ -48,9 +69,26 @@ const SignUp = () => {
     </div>
   );
 };
+
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignIn = async (email, password) => {
+    try {
+      const response = await api.post("/signin", { email, password });
+      console.log("Sign-in successful:", response.data);
+      navigate("/home"); // Redirect to home page after successful sign-in
+    } catch (error) {
+      console.error("Sign-in error:", error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleSignInSubmit = async (e) => {
+    e.preventDefault();
+    await handleSignIn(email, password);
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-black-500 to-blue-500 p-4">
@@ -75,6 +113,7 @@ const SignIn = () => {
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-4 rounded-lg hover:bg-indigo-700 transition duration-300 font-bold shadow-lg text-lg"
+          onClick={handleSignInSubmit}
         >
           Sign In
         </button>
